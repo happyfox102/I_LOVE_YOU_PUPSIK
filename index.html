@@ -478,6 +478,7 @@
       const statusEl = document.getElementById("status");
       const certEl = document.getElementById("certificate");
       const certMeta = document.getElementById("certMeta");
+      const photoEls = Array.from(document.querySelectorAll(".photo"));
 
       const HOLD_MS = 5000;
       let holdStarted = 0;
@@ -601,6 +602,34 @@
         screens[0].classList.add("in-view");
       }
 
+      function setupImageFallbacks() {
+        const repoName = "I_LOVE_YOU_PUPSIK";
+        const pathParts = window.location.pathname.split("/").filter(Boolean);
+        const firstSegment = pathParts.length > 0 ? pathParts[0] : "";
+
+        photoEls.forEach((img) => {
+          const fileName = img.getAttribute("src").split("/").pop();
+          const candidates = [
+            "image/" + fileName,
+            "./image/" + fileName,
+            "/" + repoName + "/image/" + fileName,
+          ];
+          if (firstSegment) {
+            candidates.push("/" + firstSegment + "/image/" + fileName);
+          }
+
+          let idx = 0;
+          img.addEventListener("error", () => {
+            idx += 1;
+            if (idx < candidates.length) {
+              img.src = candidates[idx];
+              return;
+            }
+            img.alt = "Фото не найдено: " + fileName;
+          });
+        });
+      }
+
       async function loadLast() {
         try {
           const response = await fetch("./api/last");
@@ -643,6 +672,7 @@
       });
 
       setupObserver();
+      setupImageFallbacks();
       initHeartProgress();
       loadLast();
     })();

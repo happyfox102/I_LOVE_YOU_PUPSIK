@@ -1,5 +1,4 @@
 import json
-import mimetypes
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import urlparse
@@ -9,7 +8,6 @@ from database import get_last_signature, init_db, save_signature
 
 BASE_DIR = Path(__file__).resolve().parent
 INDEX_FILE = BASE_DIR / "index.html"
-IMAGE_DIR = BASE_DIR / "image"
 HOST = "127.0.0.1"
 PORT = 8000
 
@@ -34,36 +32,10 @@ class ValentineHandler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(body)
 
-    def _serve_static_file(self, file_path: Path) -> None:
-        if not file_path.exists() or not file_path.is_file():
-            self.send_error(404, "File not found")
-            return
-        body = file_path.read_bytes()
-        content_type, _ = mimetypes.guess_type(str(file_path))
-        if not content_type:
-            content_type = "application/octet-stream"
-        if content_type.startswith("text/"):
-            content_type = f"{content_type}; charset=utf-8"
-        self.send_response(200)
-        self.send_header("Content-Type", content_type)
-        self.send_header("Content-Length", str(len(body)))
-        self.end_headers()
-        self.wfile.write(body)
-
     def do_GET(self) -> None:
         parsed = urlparse(self.path)
         if parsed.path in ("/", "/index.html"):
             self._serve_index()
-            return
-        if parsed.path.startswith("/image/"):
-            rel = parsed.path.removeprefix("/image/")
-            target = (IMAGE_DIR / rel).resolve()
-            try:
-                target.relative_to(IMAGE_DIR.resolve())
-            except ValueError:
-                self.send_error(403, "Forbidden")
-                return
-            self._serve_static_file(target)
             return
         if parsed.path == "/api/last":
             last = get_last_signature()
