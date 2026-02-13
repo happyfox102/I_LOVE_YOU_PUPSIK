@@ -319,7 +319,7 @@
         <!-- CHANGE_TEXT: BLOCK_1_TITLE -->
         <h1>Ты мое самое нежное чувство</h1>
         <div class="content">
-          <img class="photo" src="/image/photo_1_2026-02-13_22-12-10.jpg" alt="Фото 1" loading="eager" decoding="async" />
+          <img class="photo" src="image/photo_1_2026-02-13_22-12-10.jpg" alt="Фото 1" loading="eager" decoding="async" />
           <div class="text-space">
             <p class="text-title">Место для твоего текста</p>
             <!-- CHANGE_TEXT: BLOCK_1_TEXT -->
@@ -335,7 +335,7 @@
         <!-- CHANGE_TEXT: BLOCK_2_TITLE -->
         <h2>С тобой мир ярче</h2>
         <div class="content">
-          <img class="photo" src="/image/photo_2_2026-02-13_22-12-10.jpg" alt="Фото 2" loading="lazy" decoding="async" />
+          <img class="photo" src="image/photo_2_2026-02-13_22-12-10.jpg" alt="Фото 2" loading="lazy" decoding="async" />
           <div class="text-space">
             <p class="text-title">Место для твоего текста</p>
             <!-- CHANGE_TEXT: BLOCK_2_TEXT -->
@@ -351,7 +351,7 @@
         <!-- CHANGE_TEXT: BLOCK_3_TITLE -->
         <h2>Ты мой лучший выбор</h2>
         <div class="content">
-          <img class="photo" src="/image/photo_3_2026-02-13_22-12-10.jpg" alt="Фото 3" loading="lazy" decoding="async" />
+          <img class="photo" src="image/photo_3_2026-02-13_22-12-10.jpg" alt="Фото 3" loading="lazy" decoding="async" />
           <div class="text-space">
             <p class="text-title">Место для твоего текста</p>
             <!-- CHANGE_TEXT: BLOCK_3_TEXT -->
@@ -367,7 +367,7 @@
         <!-- CHANGE_TEXT: BLOCK_4_TITLE -->
         <h2>Ты моя радость</h2>
         <div class="content">
-          <img class="photo" src="/image/photo_4_2026-02-13_22-12-10.jpg" alt="Фото 4" loading="lazy" decoding="async" />
+          <img class="photo" src="image/photo_4_2026-02-13_22-12-10.jpg" alt="Фото 4" loading="lazy" decoding="async" />
           <div class="text-space">
             <p class="text-title">Место для твоего текста</p>
             <!-- CHANGE_TEXT: BLOCK_4_TEXT -->
@@ -383,7 +383,7 @@
         <!-- CHANGE_TEXT: BLOCK_5_TITLE -->
         <h2>С тобой тепло</h2>
         <div class="content">
-          <img class="photo" src="/image/photo_5_2026-02-13_22-12-10.jpg" alt="Фото 5" loading="lazy" decoding="async" />
+          <img class="photo" src="image/photo_5_2026-02-13_22-12-10.jpg" alt="Фото 5" loading="lazy" decoding="async" />
           <div class="text-space">
             <p class="text-title">Место для твоего текста</p>
             <!-- CHANGE_TEXT: BLOCK_5_TEXT -->
@@ -399,7 +399,7 @@
         <!-- CHANGE_TEXT: BLOCK_6_TITLE -->
         <h2>Я хочу быть рядом всегда</h2>
         <div class="content">
-          <img class="photo" src="/image/photo_6_2026-02-13_22-12-10.jpg" alt="Фото 6" loading="lazy" decoding="async" />
+          <img class="photo" src="image/photo_6_2026-02-13_22-12-10.jpg" alt="Фото 6" loading="lazy" decoding="async" />
           <div class="text-space">
             <p class="text-title">Место для твоего текста</p>
             <!-- CHANGE_TEXT: BLOCK_6_TEXT -->
@@ -415,7 +415,7 @@
         <!-- CHANGE_TEXT: BLOCK_7_TITLE -->
         <h2>Это только начало</h2>
         <div class="content">
-          <img class="photo" src="/image/photo_7_2026-02-13_22-12-10.jpg" alt="Фото 7" loading="lazy" decoding="async" />
+          <img class="photo" src="image/photo_7_2026-02-13_22-12-10.jpg" alt="Фото 7" loading="lazy" decoding="async" />
           <div class="text-space">
             <p class="text-title">Место для твоего текста</p>
             <!-- CHANGE_TEXT: BLOCK_7_TEXT -->
@@ -431,7 +431,7 @@
         <!-- CHANGE_TEXT: BLOCK_8_TITLE -->
         <h2>Финальный сюрприз</h2>
         <div class="content">
-          <img class="photo" src="/image/photo_8_2026-02-13_22-12-10.jpg" alt="Фото 8" loading="lazy" decoding="async" />
+          <img class="photo" src="image/photo_8_2026-02-13_22-12-10.jpg" alt="Фото 8" loading="lazy" decoding="async" />
           <div class="text-space">
             <div class="touch-zone">
               <!-- CHANGE_TEXT: HOLD_HINT -->
@@ -485,6 +485,7 @@
       let holdDone = false;
       let raf = null;
       let heartMarks = [];
+      const LOCAL_KEY = "love_surprise_local";
 
       function setStatus(text, ok) {
         statusEl.textContent = text;
@@ -516,6 +517,26 @@
         certEl.classList.add("show");
       }
 
+      function saveLocalDocument(seconds) {
+        const doc = {
+          id: "LOCAL",
+          signed_at: new Date().toISOString().slice(0, 19).replace("T", " "),
+          hold_seconds: Number(seconds || 5),
+          note: "local-fallback"
+        };
+        localStorage.setItem(LOCAL_KEY, JSON.stringify(doc));
+        return doc;
+      }
+
+      function readLocalDocument() {
+        try {
+          const raw = localStorage.getItem(LOCAL_KEY);
+          return raw ? JSON.parse(raw) : null;
+        } catch (_) {
+          return null;
+        }
+      }
+
       async function finishHold(seconds) {
         holdDone = true;
         holdActive = false;
@@ -523,7 +544,7 @@
         updateRing(1);
         setStatus("Открываю сюрприз...", false);
         try {
-          const response = await fetch("/api/sign", {
+          const response = await fetch("./api/sign", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ holdSeconds: seconds, note: "fingerprint-surprise" })
@@ -533,9 +554,9 @@
           showCertificate(data.document || {});
           setStatus("Готово. Сюрприз сохранен.", true);
         } catch (err) {
-          holdDone = false;
-          updateRing(0);
-          setStatus("Не получилось открыть: " + err.message, false);
+          const localDoc = saveLocalDocument(seconds);
+          showCertificate(localDoc);
+          setStatus("Готово. Сюрприз сохранен локально в браузере.", true);
         }
       }
 
@@ -582,16 +603,24 @@
 
       async function loadLast() {
         try {
-          const response = await fetch("/api/last");
+          const response = await fetch("./api/last");
           const data = await response.json();
           if (data && data.ok && data.last) {
             holdDone = true;
             updateRing(1);
             showCertificate(data.last);
             setStatus("Сюрприз уже открыт раньше.", true);
+            return;
           }
         } catch (_) {
-          // ignore
+          // no backend in static hosting mode
+        }
+        const localDoc = readLocalDocument();
+        if (localDoc) {
+          holdDone = true;
+          updateRing(1);
+          showCertificate(localDoc);
+          setStatus("Сюрприз уже открыт раньше.", true);
         }
       }
 
