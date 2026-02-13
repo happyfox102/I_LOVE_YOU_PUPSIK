@@ -1,0 +1,25 @@
+<component name="InspectionProjectProfileManager">
+  <profile version="1.0">
+    <option name="myName" value="Project Default" />
+    <inspection_tool class="PyPackageRequirementsInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="ignoredPackages">
+        <list>
+          <option value="blinker" />
+          <option value="cffi" />
+          <option value="click" />
+          <option value="colorama" />
+          <option value="cryptography" />
+          <option value="Flask" />
+          <option value="flask-cors" />
+          <option value="itsdangerous" />
+          <option value="Jinja2" />
+          <option value="jwt" />
+          <option value="MarkupSafe" />
+          <option value="psycopg2" />
+          <option value="pycparser" />
+          <option value="Werkzeug" />
+        </list>
+      </option>
+    </inspection_tool>
+  </profile>
+</component>

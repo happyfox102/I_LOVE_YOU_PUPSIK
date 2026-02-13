@@ -1,0 +1,622 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Love Story</title>
+  <style>
+    :root {
+      --bg-1: #2a0f23;
+      --bg-2: #4a1e3f;
+      --bg-3: #6f2f59;
+      --rose: #ff7fb7;
+      --soft: #ffe3f1;
+      --text: #fff6fb;
+      --line: rgba(255, 255, 255, 0.28);
+      --gold: #ffd782;
+      --ok: #8ff2bf;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      height: 100%;
+      overflow: hidden;
+      color: var(--text);
+      font-family: "Segoe UI", "Trebuchet MS", sans-serif;
+      background:
+        radial-gradient(1200px 760px at 12% -8%, rgba(255, 168, 215, 0.42), transparent 60%),
+        radial-gradient(1000px 680px at 90% 5%, rgba(255, 114, 184, 0.32), transparent 58%),
+        linear-gradient(145deg, var(--bg-1), var(--bg-2), var(--bg-3));
+    }
+
+    .hearts-bg {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.2;
+      background-image:
+        radial-gradient(circle at 20% 20%, rgba(255,255,255,.7) 0 1px, transparent 2px),
+        radial-gradient(circle at 78% 40%, rgba(255,255,255,.45) 0 1px, transparent 2px),
+        radial-gradient(circle at 50% 80%, rgba(255,255,255,.3) 0 1px, transparent 2px);
+      animation: drift 14s linear infinite alternate;
+    }
+
+    .scroller {
+      position: relative;
+      z-index: 1;
+      height: 100svh;
+      overflow-y: auto;
+      scroll-snap-type: y mandatory;
+      scroll-snap-stop: always;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior-y: contain;
+    }
+
+    .screen {
+      min-height: 100svh;
+      scroll-snap-align: start;
+      display: grid;
+      place-items: center;
+      padding: 12px;
+    }
+
+    .panel {
+      width: min(980px, 100%);
+      min-height: 90svh;
+      border: 1px solid var(--line);
+      border-radius: 26px;
+      padding: 12px;
+      background: linear-gradient(160deg, rgba(255,255,255,.17), rgba(255,255,255,.05));
+      backdrop-filter: blur(10px);
+      box-shadow: 0 18px 55px rgba(0, 0, 0, .28);
+      display: grid;
+      grid-template-rows: auto auto 1fr auto;
+      gap: 10px;
+      opacity: 0;
+      transform: translateY(48px) scale(.92);
+      filter: blur(6px);
+    }
+
+    .screen.in-view .panel {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      filter: blur(0);
+      transition: .9s cubic-bezier(.16,.84,.44,1);
+    }
+
+    .meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: .84rem;
+      color: #ffe7f4;
+    }
+
+    .tag {
+      border: 1px solid rgba(255,255,255,.28);
+      border-radius: 999px;
+      padding: 4px 10px;
+      background: rgba(255,255,255,.08);
+    }
+
+    h1, h2 {
+      margin: 0;
+      line-height: 1.08;
+      text-wrap: balance;
+      text-shadow: 0 0 24px rgba(255, 127, 183, .33);
+    }
+
+    h1 { font-size: clamp(2rem, 8.5vw, 3.8rem); }
+    h2 { font-size: clamp(1.35rem, 5.5vw, 2rem); }
+
+    .content {
+      display: grid;
+      gap: 10px;
+      grid-template-rows: minmax(34svh, 1fr) minmax(24svh, auto);
+    }
+
+    .photo {
+      width: 100%;
+      height: 100%;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,.3);
+      object-fit: cover;
+      object-position: center;
+      box-shadow: 0 14px 36px rgba(0,0,0,.25);
+    }
+
+    .text-space {
+      border-radius: 16px;
+      border: 1px dashed rgba(255,255,255,.35);
+      background: rgba(255,255,255,.07);
+      padding: 14px;
+      display: grid;
+      align-content: start;
+      gap: 8px;
+      min-height: 24svh;
+    }
+
+    .text-title {
+      margin: 0;
+      color: var(--soft);
+      font-size: .9rem;
+      opacity: .9;
+    }
+
+    .text-line {
+      height: 10px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, rgba(255,255,255,.28), rgba(255,255,255,.12));
+    }
+
+    .text-line.w1 { width: 95%; }
+    .text-line.w2 { width: 85%; }
+    .text-line.w3 { width: 75%; }
+    .text-line.w4 { width: 90%; }
+
+    .touch-zone {
+      display: grid;
+      justify-items: center;
+      gap: 9px;
+    }
+
+    .touch-note {
+      margin: 0;
+      color: #ffecf7;
+      font-size: clamp(.98rem, 4vw, 1.2rem);
+      text-align: center;
+    }
+
+    .fingerprint {
+      width: min(210px, 68vw);
+      aspect-ratio: 1 / 1;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.35);
+      display: grid;
+      place-items: center;
+      position: relative;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 50% 40%, rgba(255,255,255,.22), rgba(255,255,255,.04) 55%, transparent),
+        radial-gradient(circle at 50% 50%, rgba(255, 127, 183, .2), transparent 65%);
+      box-shadow: inset 0 0 24px rgba(255, 127, 183, .28), 0 14px 34px rgba(0,0,0,.3);
+      touch-action: none;
+      user-select: none;
+      cursor: pointer;
+    }
+
+    .ring {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      grid-template-columns: repeat(10, 1fr);
+      align-items: end;
+      gap: 2px;
+      padding: 10px;
+      opacity: 0.95;
+    }
+
+    .ring i {
+      display: grid;
+      place-items: center;
+      color: rgba(255, 255, 255, 0.28);
+      font-size: 11px;
+      transform: translateY(8px) scale(0.9);
+      transition: color .16s ease, transform .16s ease;
+    }
+
+    .ring i.on {
+      color: var(--gold);
+      transform: translateY(0) scale(1.04);
+      text-shadow: 0 0 12px rgba(255, 215, 130, .85);
+    }
+
+    .fp-icon {
+      width: min(102px, 28vw);
+      height: min(102px, 28vw);
+      z-index: 1;
+    }
+
+    .fp-icon svg {
+      width: 100%;
+      height: 100%;
+      fill: none;
+      stroke: rgba(255,255,255,.95);
+      stroke-width: 5.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      filter: drop-shadow(0 0 15px rgba(255,127,183,.58));
+      animation: pulse 2.4s ease-in-out infinite;
+    }
+
+    .status {
+      min-height: 20px;
+      color: #ffedf8;
+      font-weight: 600;
+      font-size: .92rem;
+    }
+
+    .status.ok { color: var(--ok); }
+
+    .certificate {
+      display: none;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.28);
+      background: linear-gradient(155deg, #fff8fc, #ffe9f5);
+      color: #4a1f3a;
+      padding: 12px;
+      box-shadow: 0 16px 45px rgba(0,0,0,.25);
+    }
+
+    .certificate.show {
+      display: block;
+      animation: certIn .75s cubic-bezier(.16,.84,.44,1) both;
+    }
+
+    .cert-title { margin: 0 0 6px; font-size: 1.08rem; color: #7b2f5f; }
+    .cert-meta { margin: 6px 0 0; font-size: .84rem; color: #6d4a60; }
+
+    .dots {
+      position: fixed;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 3;
+      display: grid;
+      gap: 7px;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.7);
+      background: rgba(255,255,255,.2);
+      transition: .24s ease;
+    }
+
+    .dot.active {
+      transform: scale(1.22);
+      background: white;
+    }
+
+    @keyframes pulse {
+      0%,100% { transform: scale(1); opacity: .9; }
+      50% { transform: scale(1.06); opacity: 1; }
+    }
+
+    @keyframes certIn {
+      from { transform: translateY(48px) scale(.9) rotate(-3deg); opacity: 0; }
+      to { transform: translateY(0) scale(1) rotate(0); opacity: 1; }
+    }
+
+    @keyframes drift {
+      from { transform: translateX(-12px); }
+      to { transform: translateX(12px); }
+    }
+
+    @media (max-width: 760px) {
+      .dots { display: none; }
+      .panel { min-height: 92svh; }
+    }
+  </style>
+</head>
+<body>
+  <div class="hearts-bg"></div>
+
+  <nav class="dots">
+    <div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+    <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+  </nav>
+
+  <main class="scroller" id="scroller">
+    <section class="screen" id="s1">
+      <article class="panel">
+        <div class="meta"><span class="tag">01 / 08</span><span>Love Story</span></div>
+        <!-- CHANGE_TEXT: BLOCK_1_TITLE -->
+        <h1>Ты мое самое нежное чувство</h1>
+        <div class="content">
+          <img class="photo" src="/image/photo_1_2026-02-13_22-12-10.jpg" alt="Фото 1" loading="eager" decoding="async" />
+          <div class="text-space">
+            <p class="text-title">Место для твоего текста</p>
+            <!-- CHANGE_TEXT: BLOCK_1_TEXT -->
+            <div class="text-line w1"></div><div class="text-line w2"></div><div class="text-line w3"></div><div class="text-line w4"></div>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <section class="screen" id="s2">
+      <article class="panel">
+        <div class="meta"><span class="tag">02 / 08</span><span>Our Moments</span></div>
+        <!-- CHANGE_TEXT: BLOCK_2_TITLE -->
+        <h2>С тобой мир ярче</h2>
+        <div class="content">
+          <img class="photo" src="/image/photo_2_2026-02-13_22-12-10.jpg" alt="Фото 2" loading="lazy" decoding="async" />
+          <div class="text-space">
+            <p class="text-title">Место для твоего текста</p>
+            <!-- CHANGE_TEXT: BLOCK_2_TEXT -->
+            <div class="text-line w1"></div><div class="text-line w2"></div><div class="text-line w3"></div><div class="text-line w4"></div>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <section class="screen" id="s3">
+      <article class="panel">
+        <div class="meta"><span class="tag">03 / 08</span><span>Our Smile</span></div>
+        <!-- CHANGE_TEXT: BLOCK_3_TITLE -->
+        <h2>Ты мой лучший выбор</h2>
+        <div class="content">
+          <img class="photo" src="/image/photo_3_2026-02-13_22-12-10.jpg" alt="Фото 3" loading="lazy" decoding="async" />
+          <div class="text-space">
+            <p class="text-title">Место для твоего текста</p>
+            <!-- CHANGE_TEXT: BLOCK_3_TEXT -->
+            <div class="text-line w1"></div><div class="text-line w2"></div><div class="text-line w3"></div><div class="text-line w4"></div>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <section class="screen" id="s4">
+      <article class="panel">
+        <div class="meta"><span class="tag">04 / 08</span><span>Our Heart</span></div>
+        <!-- CHANGE_TEXT: BLOCK_4_TITLE -->
+        <h2>Ты моя радость</h2>
+        <div class="content">
+          <img class="photo" src="/image/photo_4_2026-02-13_22-12-10.jpg" alt="Фото 4" loading="lazy" decoding="async" />
+          <div class="text-space">
+            <p class="text-title">Место для твоего текста</p>
+            <!-- CHANGE_TEXT: BLOCK_4_TEXT -->
+            <div class="text-line w1"></div><div class="text-line w2"></div><div class="text-line w3"></div><div class="text-line w4"></div>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <section class="screen" id="s5">
+      <article class="panel">
+        <div class="meta"><span class="tag">05 / 08</span><span>Our Home</span></div>
+        <!-- CHANGE_TEXT: BLOCK_5_TITLE -->
+        <h2>С тобой тепло</h2>
+        <div class="content">
+          <img class="photo" src="/image/photo_5_2026-02-13_22-12-10.jpg" alt="Фото 5" loading="lazy" decoding="async" />
+          <div class="text-space">
+            <p class="text-title">Место для твоего текста</p>
+            <!-- CHANGE_TEXT: BLOCK_5_TEXT -->
+            <div class="text-line w1"></div><div class="text-line w2"></div><div class="text-line w3"></div><div class="text-line w4"></div>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <section class="screen" id="s6">
+      <article class="panel">
+        <div class="meta"><span class="tag">06 / 08</span><span>Our Future</span></div>
+        <!-- CHANGE_TEXT: BLOCK_6_TITLE -->
+        <h2>Я хочу быть рядом всегда</h2>
+        <div class="content">
+          <img class="photo" src="/image/photo_6_2026-02-13_22-12-10.jpg" alt="Фото 6" loading="lazy" decoding="async" />
+          <div class="text-space">
+            <p class="text-title">Место для твоего текста</p>
+            <!-- CHANGE_TEXT: BLOCK_6_TEXT -->
+            <div class="text-line w1"></div><div class="text-line w2"></div><div class="text-line w3"></div><div class="text-line w4"></div>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <section class="screen" id="s7">
+      <article class="panel">
+        <div class="meta"><span class="tag">07 / 08</span><span>Our Story</span></div>
+        <!-- CHANGE_TEXT: BLOCK_7_TITLE -->
+        <h2>Это только начало</h2>
+        <div class="content">
+          <img class="photo" src="/image/photo_7_2026-02-13_22-12-10.jpg" alt="Фото 7" loading="lazy" decoding="async" />
+          <div class="text-space">
+            <p class="text-title">Место для твоего текста</p>
+            <!-- CHANGE_TEXT: BLOCK_7_TEXT -->
+            <div class="text-line w1"></div><div class="text-line w2"></div><div class="text-line w3"></div><div class="text-line w4"></div>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <section class="screen" id="s8">
+      <article class="panel">
+        <div class="meta"><span class="tag">08 / 08</span><span>Final Surprise</span></div>
+        <!-- CHANGE_TEXT: BLOCK_8_TITLE -->
+        <h2>Финальный сюрприз</h2>
+        <div class="content">
+          <img class="photo" src="/image/photo_8_2026-02-13_22-12-10.jpg" alt="Фото 8" loading="lazy" decoding="async" />
+          <div class="text-space">
+            <div class="touch-zone">
+              <!-- CHANGE_TEXT: HOLD_HINT -->
+              <p class="touch-note">Задержи пальчик на отпечатке 5 секунд</p>
+              <div class="fingerprint" id="fingerprint" role="button" tabindex="0" aria-label="Задержи пальчик">
+                <div class="ring" id="ring"></div>
+                <div class="fp-icon" aria-hidden="true">
+                  <svg viewBox="0 0 120 120">
+                    <path d="M60 16c-19 0-34 15-34 34" />
+                    <path d="M79 28c-5-8-12-12-21-12-18 0-32 14-32 32" />
+                    <path d="M92 44c0-18-15-33-33-33S26 26 26 44" />
+                    <path d="M101 60c0-24-18-42-42-42S17 36 17 60" />
+                    <path d="M33 62c0 14-3 27-10 39" />
+                    <path d="M46 62c0 17-4 33-12 47" />
+                    <path d="M59 62c0 20-4 38-11 54" />
+                    <path d="M72 62c0 20 4 38 11 54" />
+                    <path d="M85 62c0 17 5 33 13 47" />
+                    <path d="M98 62c0 14 5 25 12 36" />
+                  </svg>
+                </div>
+              </div>
+              <div class="status" id="status"></div>
+            </div>
+            <div class="certificate" id="certificate">
+              <!-- CHANGE_TEXT: CERT_TITLE -->
+              <h3 class="cert-title">Сертификат нежности</h3>
+              <!-- CHANGE_TEXT: CERT_TEXT -->
+              <p>Этот сюрприз говорит о том, что моё сердце всегда выбирает тебя.</p>
+              <p class="cert-meta" id="certMeta"></p>
+            </div>
+          </div>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <script>
+    (function () {
+      const scroller = document.getElementById("scroller");
+      const screens = Array.from(document.querySelectorAll(".screen"));
+      const dots = Array.from(document.querySelectorAll(".dot"));
+      const fingerprint = document.getElementById("fingerprint");
+      const ring = document.getElementById("ring");
+      const statusEl = document.getElementById("status");
+      const certEl = document.getElementById("certificate");
+      const certMeta = document.getElementById("certMeta");
+
+      const HOLD_MS = 5000;
+      let holdStarted = 0;
+      let holdActive = false;
+      let holdDone = false;
+      let raf = null;
+      let heartMarks = [];
+
+      function setStatus(text, ok) {
+        statusEl.textContent = text;
+        statusEl.classList.toggle("ok", Boolean(ok));
+      }
+
+      function initHeartProgress() {
+        const heartsCount = 30;
+        const frag = document.createDocumentFragment();
+        for (let i = 0; i < heartsCount; i += 1) {
+          const h = document.createElement("i");
+          h.textContent = "❤";
+          frag.appendChild(h);
+        }
+        ring.appendChild(frag);
+        heartMarks = Array.from(ring.querySelectorAll("i"));
+      }
+
+      function updateRing(ratio) {
+        const clamped = Math.max(0, Math.min(1, ratio));
+        const active = Math.round(clamped * heartMarks.length);
+        heartMarks.forEach((h, idx) => h.classList.toggle("on", idx < active));
+      }
+
+      function showCertificate(doc) {
+        const id = doc.id || "N/A";
+        const signed = doc.signed_at || new Date().toISOString().slice(0, 19).replace("T", " ");
+        certMeta.textContent = "Сюрприз #" + id + " | Дата (UTC): " + signed;
+        certEl.classList.add("show");
+      }
+
+      async function finishHold(seconds) {
+        holdDone = true;
+        holdActive = false;
+        cancelAnimationFrame(raf);
+        updateRing(1);
+        setStatus("Открываю сюрприз...", false);
+        try {
+          const response = await fetch("/api/sign", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ holdSeconds: seconds, note: "fingerprint-surprise" })
+          });
+          const data = await response.json();
+          if (!response.ok || !data.ok) throw new Error(data.error || "Ошибка");
+          showCertificate(data.document || {});
+          setStatus("Готово. Сюрприз сохранен.", true);
+        } catch (err) {
+          holdDone = false;
+          updateRing(0);
+          setStatus("Не получилось открыть: " + err.message, false);
+        }
+      }
+
+      function tickHold() {
+        if (!holdActive) return;
+        const elapsed = Date.now() - holdStarted;
+        const ratio = Math.min(elapsed / HOLD_MS, 1);
+        updateRing(ratio);
+        setStatus("Держи... " + Math.max(0, Math.ceil(5 - elapsed / 1000)) + "с", false);
+        if (ratio >= 1) {
+          finishHold(elapsed / 1000);
+          return;
+        }
+        raf = requestAnimationFrame(tickHold);
+      }
+
+      function startHold() {
+        if (holdDone) return;
+        holdActive = true;
+        holdStarted = Date.now();
+        tickHold();
+      }
+
+      function stopHold() {
+        if (!holdActive || holdDone) return;
+        holdActive = false;
+        cancelAnimationFrame(raf);
+        updateRing(0);
+        setStatus("Немного дольше, держи 5 секунд.", false);
+      }
+
+      function setupObserver() {
+        const io = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            if (!entry.isIntersecting) return;
+            const i = screens.indexOf(entry.target);
+            entry.target.classList.add("in-view");
+            dots.forEach((dot, idx) => dot.classList.toggle("active", idx === i));
+          });
+        }, { root: scroller, threshold: 0.25 });
+        screens.forEach((s) => io.observe(s));
+        screens[0].classList.add("in-view");
+      }
+
+      async function loadLast() {
+        try {
+          const response = await fetch("/api/last");
+          const data = await response.json();
+          if (data && data.ok && data.last) {
+            holdDone = true;
+            updateRing(1);
+            showCertificate(data.last);
+            setStatus("Сюрприз уже открыт раньше.", true);
+          }
+        } catch (_) {
+          // ignore
+        }
+      }
+
+      fingerprint.addEventListener("pointerdown", startHold);
+      ["pointerup", "pointerleave", "pointercancel"].forEach((evt) => {
+        fingerprint.addEventListener(evt, stopHold);
+      });
+
+      fingerprint.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          startHold();
+        }
+      });
+      fingerprint.addEventListener("keyup", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          stopHold();
+        }
+      });
+
+      setupObserver();
+      initHeartProgress();
+      loadLast();
+    })();
+  </script>
+</body>
+</html>
