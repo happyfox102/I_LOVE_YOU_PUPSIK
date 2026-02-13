@@ -1,679 +1,669 @@
-﻿<!doctype html>
+﻿<!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>Love Story</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>14 февраля · самая милая история</title>
   <style>
-    :root {
-      --bg-1: #2a0f23;
-      --bg-2: #4a1e3f;
-      --bg-3: #6f2f59;
-      --rose: #ff7fb7;
-      --soft: #ffe3f1;
-      --text: #fff6fb;
-      --line: rgba(255, 255, 255, 0.28);
-      --gold: #ffd782;
-      --ok: #8ff2bf;
-    }
-
-    * { box-sizing: border-box; }
-
-    html, body {
+    * {
       margin: 0;
-      height: 100%;
-      overflow: hidden;
-      color: var(--text);
-      font-family: "Segoe UI", "Trebuchet MS", sans-serif;
-      background:
-        radial-gradient(1200px 760px at 12% -8%, rgba(255, 168, 215, 0.42), transparent 60%),
-        radial-gradient(1000px 680px at 90% 5%, rgba(255, 114, 184, 0.32), transparent 58%),
-        linear-gradient(145deg, var(--bg-1), var(--bg-2), var(--bg-3));
+      padding: 0;
+      box-sizing: border-box;
     }
 
-    .hearts-bg {
+    body {
+      font-family: 'Segoe UI', 'Quicksand', system-ui, -apple-system, sans-serif;
+      background: #fdeff2;  /* нежная база */
+      height: 100vh;
+      overflow: hidden;
+      color: #5e4b56;
+    }
+
+    /* акварельный фон с облачками */
+    .clouds-bg {
+      position: fixed;
+      inset: 0;
+      background: linear-gradient(145deg, #ffe9f0, #ffe0f0, #fff0f5);
+      z-index: -2;
+    }
+
+    .clouds-bg::before {
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background-image:
+        radial-gradient(circle at 10% 30%, rgba(255, 255, 255, 0.7) 3px, transparent 4px),
+        radial-gradient(circle at 25% 70%, rgba(255, 240, 245, 0.6) 6px, transparent 7px),
+        radial-gradient(circle at 80% 20%, rgba(255, 255, 200, 0.5) 8px, transparent 9px),
+        radial-gradient(circle at 45% 85%, #ffc0cb70 15px, transparent 20px);
+      background-size: 200px 200px;
+      animation: cloudDrift 38s infinite alternate ease-in-out;
+    }
+
+    @keyframes cloudDrift {
+      0% { background-position: 0% 0%; }
+      100% { background-position: 5% 5%; }
+    }
+
+    /* летающие валентинки (конвертики) */
+    .floaties {
       position: fixed;
       inset: 0;
       pointer-events: none;
-      z-index: 0;
+      z-index: -1;
+    }
+    .floaty-item {
+      position: absolute;
+      font-size: 2rem;
       opacity: 0.2;
-      background-image:
-        radial-gradient(circle at 20% 20%, rgba(255,255,255,.7) 0 1px, transparent 2px),
-        radial-gradient(circle at 78% 40%, rgba(255,255,255,.45) 0 1px, transparent 2px),
-        radial-gradient(circle at 50% 80%, rgba(255,255,255,.3) 0 1px, transparent 2px);
-      animation: drift 14s linear infinite alternate;
+      animation: floatAround 14s infinite alternate;
+      filter: drop-shadow(0 4px 6px rgba(255, 80, 120, 0.1));
+    }
+    @keyframes floatAround {
+      0% { transform: translate(0, 0) rotate(0deg); }
+      100% { transform: translate(30px, -40px) rotate(12deg); }
     }
 
+    /* основной скроллер */
     .scroller {
-      position: relative;
-      z-index: 1;
-      height: 100svh;
-      overflow-y: auto;
+      height: 100vh;
+      overflow-y: scroll;
       scroll-snap-type: y mandatory;
-      scroll-snap-stop: always;
+      scroll-behavior: smooth;
       -webkit-overflow-scrolling: touch;
-      overscroll-behavior-y: contain;
+      position: relative;
+      z-index: 5;
+      padding: 0 10px;
     }
 
+    /* экраны */
     .screen {
-      min-height: 100svh;
+      min-height: 100vh;
       scroll-snap-align: start;
-      display: grid;
-      place-items: center;
-      padding: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
     }
 
-    .panel {
-      width: min(980px, 100%);
-      min-height: 90svh;
-      border: 1px solid var(--line);
-      border-radius: 26px;
-      padding: 12px;
-      background: linear-gradient(160deg, rgba(255,255,255,.17), rgba(255,255,255,.05));
-      backdrop-filter: blur(10px);
-      box-shadow: 0 18px 55px rgba(0, 0, 0, .28);
+    /* карточки — как открытки */
+    .card {
+      max-width: 900px;
+      width: 100%;
+      min-height: 80vh;
+      background: rgba(255, 250, 250, 0.75);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-radius: 60px 60px 40px 40px;
+      box-shadow: 0 25px 45px -15px rgba(210, 120, 140, 0.4), 0 0 0 2px #fff9 inset;
+      padding: 24px;
       display: grid;
       grid-template-rows: auto auto 1fr auto;
-      gap: 10px;
+      gap: 16px;
+      transition: all 0.4s ease;
+      border: 1px solid rgba(255, 255, 255, 0.7);
+      transform-origin: center;
+    }
+
+    /* анимация появления */
+    .screen .card {
       opacity: 0;
-      transform: translateY(48px) scale(.92);
-      filter: blur(6px);
+      transform: translateY(50px) scale(0.92) rotate(-1deg);
+      transition: opacity 0.8s cubic-bezier(0.15, 0.85, 0.35, 1), transform 0.9s cubic-bezier(0.15, 0.85, 0.35, 1);
     }
 
-    .screen.in-view .panel {
+    .screen.in-view .card {
       opacity: 1;
-      transform: translateY(0) scale(1);
-      filter: blur(0);
-      transition: .9s cubic-bezier(.16,.84,.44,1);
+      transform: translateY(0) scale(1) rotate(0);
     }
 
-    .meta {
+    /* хедер карточки */
+    .card-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-size: .84rem;
-      color: #ffe7f4;
+      font-size: 1rem;
+      font-weight: 500;
+      color: #b3848c;
+      letter-spacing: 0.5px;
+      padding-bottom: 6px;
+      border-bottom: 2px dotted #feb6c5;
+    }
+    .card-header span:first-child {
+      background: #ffd9e2;
+      padding: 4px 16px;
+      border-radius: 40px;
+      font-size: 0.85rem;
+      color: #a1546a;
     }
 
-    .tag {
-      border: 1px solid rgba(255,255,255,.28);
-      border-radius: 999px;
-      padding: 4px 10px;
-      background: rgba(255,255,255,.08);
-    }
-
-    h1, h2 {
-      margin: 0;
-      line-height: 1.08;
-      text-wrap: balance;
-      text-shadow: 0 0 24px rgba(255, 127, 183, .33);
-    }
-
-    h1 { font-size: clamp(2rem, 8.5vw, 3.8rem); }
-    h2 { font-size: clamp(1.35rem, 5.5vw, 2rem); }
-
-    .content {
-      display: grid;
-      gap: 10px;
-      grid-template-rows: minmax(34svh, 1fr) minmax(24svh, auto);
-    }
-
-    .photo {
-      width: 100%;
-      height: 100%;
-      border-radius: 18px;
-      border: 1px solid rgba(255,255,255,.3);
-      object-fit: cover;
-      object-position: center;
-      box-shadow: 0 14px 36px rgba(0,0,0,.25);
-    }
-
-    .text-space {
-      border-radius: 16px;
-      border: 1px dashed rgba(255,255,255,.35);
-      background: rgba(255,255,255,.07);
-      padding: 14px;
-      display: grid;
-      align-content: start;
-      gap: 8px;
-      min-height: 24svh;
-    }
-
-    .text-title {
-      margin: 0;
-      color: var(--soft);
-      font-size: .9rem;
-      opacity: .9;
-    }
-
-    .text-line {
-      height: 10px;
-      border-radius: 999px;
-      background: linear-gradient(90deg, rgba(255,255,255,.28), rgba(255,255,255,.12));
-    }
-
-    .text-line.w1 { width: 95%; }
-    .text-line.w2 { width: 85%; }
-    .text-line.w3 { width: 75%; }
-    .text-line.w4 { width: 90%; }
-
-    .touch-zone {
-      display: grid;
-      justify-items: center;
-      gap: 9px;
-    }
-
-    .touch-note {
-      margin: 0;
-      color: #ffecf7;
-      font-size: clamp(.98rem, 4vw, 1.2rem);
-      text-align: center;
-    }
-
-    .fingerprint {
-      width: min(210px, 68vw);
-      aspect-ratio: 1 / 1;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,.35);
-      display: grid;
-      place-items: center;
-      position: relative;
-      overflow: hidden;
-      background:
-        radial-gradient(circle at 50% 40%, rgba(255,255,255,.22), rgba(255,255,255,.04) 55%, transparent),
-        radial-gradient(circle at 50% 50%, rgba(255, 127, 183, .2), transparent 65%);
-      box-shadow: inset 0 0 24px rgba(255, 127, 183, .28), 0 14px 34px rgba(0,0,0,.3);
-      touch-action: none;
-      user-select: none;
-      cursor: pointer;
-    }
-
-    .ring {
-      position: absolute;
-      inset: 0;
-      display: grid;
-      grid-template-columns: repeat(10, 1fr);
-      align-items: end;
-      gap: 2px;
-      padding: 10px;
-      opacity: 0.95;
-    }
-
-    .ring i {
-      display: grid;
-      place-items: center;
-      color: rgba(255, 255, 255, 0.28);
-      font-size: 11px;
-      transform: translateY(8px) scale(0.9);
-      transition: color .16s ease, transform .16s ease;
-    }
-
-    .ring i.on {
-      color: var(--gold);
-      transform: translateY(0) scale(1.04);
-      text-shadow: 0 0 12px rgba(255, 215, 130, .85);
-    }
-
-    .fp-icon {
-      width: min(102px, 28vw);
-      height: min(102px, 28vw);
-      z-index: 1;
-    }
-
-    .fp-icon svg {
-      width: 100%;
-      height: 100%;
-      fill: none;
-      stroke: rgba(255,255,255,.95);
-      stroke-width: 5.5;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-      filter: drop-shadow(0 0 15px rgba(255,127,183,.58));
-      animation: pulse 2.4s ease-in-out infinite;
-    }
-
-    .status {
-      min-height: 20px;
-      color: #ffedf8;
+    h2 {
+      font-size: clamp(1.8rem, 7vw, 3.2rem);
       font-weight: 600;
-      font-size: .92rem;
+      color: #b35f7a;
+      text-shadow: 3px 3px 0 #ffd8e4;
+      line-height: 1.1;
+      margin: 0;
+      word-break: break-word;
     }
 
-    .status.ok { color: var(--ok); }
-
-    .certificate {
-      display: none;
-      border-radius: 14px;
-      border: 1px solid rgba(255,255,255,.28);
-      background: linear-gradient(155deg, #fff8fc, #ffe9f5);
-      color: #4a1f3a;
-      padding: 12px;
-      box-shadow: 0 16px 45px rgba(0,0,0,.25);
+    /* контентная часть — фото и текст */
+    .content-grid {
+      display: grid;
+      grid-template-rows: minmax(180px, 1fr) auto;
+      gap: 20px;
     }
 
-    .certificate.show {
+    .photo-frame {
+      border-radius: 42px;
+      overflow: hidden;
+      background: #ffecf1;
+      box-shadow: 0 20px 30px -10px rgba(200, 100, 130, 0.3), inset 0 0 0 3px white;
+      height: 100%;
+      max-height: 45vh;
+    }
+
+    .photo-frame img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
       display: block;
-      animation: certIn .75s cubic-bezier(.16,.84,.44,1) both;
+      transition: transform 0.7s;
+    }
+    .photo-frame img:hover {
+      transform: scale(1.03);
     }
 
-    .cert-title { margin: 0 0 6px; font-size: 1.08rem; color: #7b2f5f; }
-    .cert-meta { margin: 6px 0 0; font-size: .84rem; color: #6d4a60; }
+    .message {
+      background: rgba(255, 255, 255, 0.8);
+      border-radius: 36px;
+      padding: 24px 26px;
+      box-shadow: inset 0 1px 5px rgba(255, 255, 255, 0.9), 0 8px 18px rgba(240, 150, 170, 0.1);
+      border: 1px solid white;
+    }
 
-    .dots {
+    .message-title {
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: #b08694;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .message-title span {
+      background: #ffe2ea;
+      padding: 4px 14px;
+      border-radius: 30px;
+    }
+
+    /* стихи или твиты — мило и пушисто */
+    .message-line {
+      font-size: 1.2rem;
+      line-height: 1.6;
+      font-weight: 400;
+      color: #6b4e59;
+      margin-bottom: 16px;
+      padding-left: 20px;
+      border-left: 5px solid #ffb7c5;
+      transition: 0.2s;
+    }
+
+    .message-line:last-child {
+      margin-bottom: 0;
+    }
+
+    .message-line i {
+      color: #f29bb0;
+      margin-right: 8px;
+    }
+
+    /* новый блок «сладкий стол» */
+    .candy-box {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      justify-content: center;
+      margin-top: 10px;
+    }
+    .candy {
+      background: #ffe6ed;
+      border-radius: 70px;
+      padding: 10px 22px;
+      font-size: 1.2rem;
+      box-shadow: 0 10px 0 #e6b0c0;
+      color: #9d5f73;
+      font-weight: 600;
+      transform: translateY(0);
+      transition: 0.15s ease;
+      border: 2px solid white;
+    }
+    .candy:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 14px 0 #d68faa;
+    }
+
+    /* зона интерактива (последний экран) */
+    .valentine-envelope {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 22px;
+    }
+
+    .envelope {
+      width: min(260px, 70vw);
+      aspect-ratio: 1.2/1;
+      background: #fccfdf;
+      border-radius: 30px 30px 15px 15px;
+      position: relative;
+      cursor: pointer;
+      box-shadow: 0 20px 20px -10px #dfa6b8, 0 0 0 3px #fff inset;
+      transition: 0.2s;
+    }
+
+    .envelope:before {
+      content: '💌';
+      position: absolute;
+      font-size: 5rem;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      transition: 0.3s;
+      filter: drop-shadow(0 6px 6px #f2aec1);
+    }
+
+    .envelope.tapped:before {
+      content: '💖';
+      transform: translate(-50%, -70%) scale(1.2);
+    }
+
+    .heart-progress {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      margin: 10px 0;
+      font-size: 2rem;
+    }
+
+    .heart-progress i {
+      color: #fbb0c0;
+      text-shadow: 0 3px 3px white;
+      transition: 0.2s;
+      transform: scale(0.9);
+    }
+
+    .heart-progress i.lit {
+      color: #ff4770;
+      transform: scale(1.2);
+      text-shadow: 0 0 15px #ff8da1;
+    }
+
+    .status-message {
+      background: #ffffffba;
+      backdrop-filter: blur(5px);
+      padding: 10px 24px;
+      border-radius: 50px;
+      font-weight: 500;
+      color: #ad657b;
+    }
+
+    .secret-letter {
+      background: #fff6f9;
+      border-radius: 36px;
+      padding: 24px;
+      box-shadow: 0 16px 35px #f4ced9;
+      border: 2px solid white;
+      display: none;
+      width: 100%;
+    }
+
+    .secret-letter.show {
+      display: block;
+      animation: letterPop 0.6s ease-out;
+    }
+
+    @keyframes letterPop {
+      0% { transform: scale(0.2) rotate(-10deg); opacity: 0; }
+      70% { transform: scale(1.02); }
+      100% { transform: scale(1) rotate(0); opacity: 1; }
+    }
+
+    .letter-title {
+      font-size: 2rem;
+      background: linear-gradient(145deg, #ea9ab2, #c76f8d);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    /* точечки справа */
+    .dot-nav {
       position: fixed;
-      right: 8px;
+      right: 16px;
       top: 50%;
       transform: translateY(-50%);
-      z-index: 3;
-      display: grid;
-      gap: 7px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      z-index: 20;
     }
 
     .dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,.7);
-      background: rgba(255,255,255,.2);
-      transition: .24s ease;
+      width: 12px;
+      height: 12px;
+      background: #fec7d4;
+      border-radius: 50%;
+      border: 2px solid white;
+      box-shadow: 0 2px 6px #e2aebd;
+      transition: 0.2s;
+      cursor: pointer;
     }
 
     .dot.active {
-      transform: scale(1.22);
-      background: white;
+      background: #fc8eb0;
+      transform: scale(1.5);
+      border-color: #ffffff;
+      box-shadow: 0 0 20px #ff9ebb;
     }
 
-    @keyframes pulse {
-      0%,100% { transform: scale(1); opacity: .9; }
-      50% { transform: scale(1.06); opacity: 1; }
-    }
-
-    @keyframes certIn {
-      from { transform: translateY(48px) scale(.9) rotate(-3deg); opacity: 0; }
-      to { transform: translateY(0) scale(1) rotate(0); opacity: 1; }
-    }
-
-    @keyframes drift {
-      from { transform: translateX(-12px); }
-      to { transform: translateX(12px); }
-    }
-
-    @media (max-width: 760px) {
-      .dots { display: none; }
-      .panel { min-height: 92svh; }
+    /* адаптив */
+    @media (max-width: 600px) {
+      .dot-nav { display: none; }
+      .card { padding: 16px; }
+      .message-line { font-size: 1rem; }
     }
   </style>
 </head>
 <body>
-  <div class="hearts-bg"></div>
+  <div class="clouds-bg"></div>
+  <div class="floaties" id="floaties"></div>
 
-  <nav class="dots">
+  <nav class="dot-nav" id="dotNav">
     <div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
     <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
   </nav>
 
   <main class="scroller" id="scroller">
-    <section class="screen" id="s1">
-      <article class="panel">
-        <div class="meta"><span class="tag">01 / 08</span><span>Love Story</span></div>
-        <!-- CHANGE_TEXT: BLOCK_1_TITLE -->
-        <h1>Ты мое самое милое чувство</h1>
-        <div class="content">
-          <img class="photo" src="image/photo_1_2026-02-13_22-12-10.jpg" alt="Фото 1" loading="eager" decoding="async" />
-          <div class="text-space">
-            <p class="text-title">Записка Любимой </p>
-            <!-- CHANGE_TEXT: BLOCK_1_TEXT -->
-            <div class="text-line w1"></div>Ты — самое прекрасное, что со мной происходило за эти два года<div class="text-line w2"></div>Каждый раз, когда мы встречаемся, моё сердце тает и открывается тебе навстречу<div class="text-line w3"></div><div class="text-line w4"></div>
+    <!-- 1. Заглавная -->
+    <section class="screen" id="screen1">
+      <div class="card">
+        <div class="card-header"><span>🍬 1/8</span><span>14 февраля ❤️</span></div>
+        <h2>Ты — мой самый сладкий сон</h2>
+        <div class="content-grid">
+          <div class="photo-frame">
+            <img src="image/photo_1_2026-02-13_22-12-10.jpg" alt="милота" loading="eager">
+          </div>
+          <div class="message">
+            <div class="message-title"><span>💭 открыточка</span></div>
+            <div class="message-line"><i>❤️</i> Каждый день с тобой — как кусочек рая</div>
+            <div class="message-line"><i>🍭</i> Твоя улыбка слаще любого десерта</div>
           </div>
         </div>
+      </div>
     </section>
 
-    <section class="screen" id="s2">
-      <article class="panel">
-        <div class="meta"><span class="tag">02 / 08</span><span>Our Moments</span></div>
-        <!-- CHANGE_TEXT: BLOCK_2_TITLE -->
-        <h2>С тобой мир ярче</h2>
-        <div class="content">
-          <img class="photo" src="image/photo_2_2026-02-13_22-12-10.jpg" alt="Фото 2" loading="lazy" decoding="async" />
-          <div class="text-space">
-            <p class="text-title">Записка Любимой</p>
-            <!-- CHANGE_TEXT: BLOCK_2_TEXT -->
-            <div class="text-line w1"></div>Ты — то, ради чего стоило прожить эти два года<div class="text-line w2"></div><div class="text-line w3"></div>Если выбирать лучшее, что было со мной за два года это без вопросов ты<div class="text-line w4"></div>
+    <!-- 2. Конфетный блок -->
+    <section class="screen" id="screen2">
+      <div class="card">
+        <div class="card-header"><span>🍭 2/8</span><span>сладкий стол</span></div>
+        <h2>Конфетти из счастья</h2>
+        <div class="content-grid">
+          <div class="photo-frame">
+            <img src="image/photo_2_2026-02-13_22-12-10.jpg" alt="candy" loading="lazy">
+          </div>
+          <div class="message">
+            <div class="candy-box">
+              <span class="candy">🍬 мармелад</span>
+              <span class="candy">🍫 поцелуй</span>
+              <span class="candy">🍭 леденец</span>
+              <span class="candy">🧁 нежность</span>
+            </div>
+            <div class="message-line">С тобой даже конфеты вкуснее вдвойне</div>
           </div>
         </div>
-      </article>
+      </div>
     </section>
 
-    <section class="screen" id="s3">
-      <article class="panel">
-        <div class="meta"><span class="tag">03 / 08</span><span>Our Smile</span></div>
-        <!-- CHANGE_TEXT: BLOCK_3_TITLE -->
-        <h2>Ты мой лучший выбор</h2>
-        <div class="content">
-          <img class="photo" src="image/photo_3_2026-02-13_22-12-10.jpg" alt="Фото 3" loading="lazy" decoding="async" />
-          <div class="text-space">
-            <p class="text-title">Записка Любимой</p>
-            <!-- CHANGE_TEXT: BLOCK_3_TEXT -->
-            <div class="text-line w1">Ты мой самый счастливый период за последние два года</div><div class="text-line w2"></div><div class="text-line w3"></div><div class="text-line w4"></div>
+    <!-- 3. Облачко любви -->
+    <section class="screen" id="screen3">
+      <div class="card">
+        <div class="card-header"><span>☁️ 3/8</span><span>наши облака</span></div>
+        <h2>Мы летим высоко</h2>
+        <div class="content-grid">
+          <div class="photo-frame">
+            <img src="image/photo_3_2026-02-13_22-12-10.jpg" alt="облака" loading="lazy">
+          </div>
+          <div class="message">
+            <div class="message-line"><i>☁️</i> Если ты рядом — я парю</div>
+            <div class="message-line"><i>✨</i> Ты моё личное облачко счастья</div>
           </div>
         </div>
-      </article>
+      </div>
     </section>
 
-    <section class="screen" id="s4">
-      <article class="panel">
-        <div class="meta"><span class="tag">04 / 08</span><span>Our Heart</span></div>
-        <!-- CHANGE_TEXT: BLOCK_4_TITLE -->
-        <h2>Ты моя радость</h2>
-        <div class="content">
-          <img class="photo" src="image/photo_4_2026-02-13_22-12-10.jpg" alt="Фото 4" loading="lazy" decoding="async" />
-          <div class="text-space">
-            <p class="text-title">Записка для самой красивой девушки </p>
-            <!-- CHANGE_TEXT: BLOCK_4_TEXT -->
-            <div class="text-line w1"></div>Ты мое самое красивое чувство<div class="text-line w2"></div><div class="text-line w3"></div><div class="text-line w4"></div>
+    <!-- 4. Игривые щенки/мимими -->
+    <section class="screen" id="screen4">
+      <div class="card">
+        <div class="card-header"><span>🐶 4/8</span><span>ми-ми-ми</span></div>
+        <h2>Ты как плюшевый мишка</h2>
+        <div class="content-grid">
+          <div class="photo-frame">
+            <img src="image/photo_4_2026-02-13_22-12-10.jpg" alt="мишка" loading="lazy">
+          </div>
+          <div class="message">
+            <div class="message-line">Обниму — и сразу тепло</div>
+            <div class="message-line">Ты самый уютный человек на планете</div>
           </div>
         </div>
-      </article>
+      </div>
     </section>
 
-    <section class="screen" id="s5">
-      <article class="panel">
-        <div class="meta"><span class="tag">05 / 08</span><span>Our Home</span></div>
-        <!-- CHANGE_TEXT: BLOCK_5_TITLE -->
-        <h2>С тобой тепло</h2>
-        <div class="content">
-          <img class="photo" src="image/photo_5_2026-02-13_22-12-10.jpg" alt="Фото 5" loading="lazy" decoding="async" />
-          <div class="text-space">
-            <p class="text-title">Записка Любимой</p>
-            <!-- CHANGE_TEXT: BLOCK_5_TEXT -->
-            <div class="text-line w1">Ты умеешь превращать мои чувства в счастия, </div><div class="text-line w2"></div><div class="text-line w3"></div><div class="text-line w4"></div>
+    <!-- 5. Воздушные шары -->
+    <section class="screen" id="screen5">
+      <div class="card">
+        <div class="card-header"><span>🎈 5/8</span><span>шарики желаний</span></div>
+        <h2>Отпускаю шарик с именем</h2>
+        <div class="content-grid">
+          <div class="photo-frame">
+            <img src="image/photo_5_2026-02-13_22-12-10.jpg" alt="balloons" loading="lazy">
+          </div>
+          <div class="message">
+            <div class="message-line">Моё желание — чтобы ты улыбалась</div>
+            <div class="message-line">Каждый день запускаю шарик любви 🎈</div>
           </div>
         </div>
-      </article>
+      </div>
     </section>
 
-    <section class="screen" id="s6">
-      <article class="panel">
-        <div class="meta"><span class="tag">06 / 08</span><span>Our Future</span></div>
-        <!-- CHANGE_TEXT: BLOCK_6_TITLE -->
-        <h2>Я хочу быть рядом всегда</h2>
-        <div class="content">
-          <img class="photo" src="image/photo_6_2026-02-13_22-12-10.jpg" alt="Фото 6" loading="lazy" decoding="async" />
-          <div class="text-space">
-            <p class="text-title">Записка Любимой</p>
-            <!-- CHANGE_TEXT: BLOCK_6_TEXT -->
-            <div class="text-line w1"></div>Если выбирать лучшее, что было со мной за два года это без вопросов ты<div class="text-line w2"></div><div class="text-line w3"></div><div class="text-line w4"></div>
+    <!-- 6. Сладкий сон -->
+    <section class="screen" id="screen6">
+      <div class="card">
+        <div class="card-header"><span>🌙 6/8</span><span>лунные грезы</span></div>
+        <h2>Ты снишься мне каждую ночь</h2>
+        <div class="content-grid">
+          <div class="photo-frame">
+            <img src="image/photo_6_2026-02-13_22-12-10.jpg" alt="moon" loading="lazy">
+          </div>
+          <div class="message">
+            <div class="message-line">Даже во сне я ищу твою руку</div>
+            <div class="message-line">Сладких снов, моя валентинка</div>
           </div>
         </div>
-      </article>
+      </div>
     </section>
 
-    <section class="screen" id="s7">
-      <article class="panel">
-        <div class="meta"><span class="tag">07 / 08</span><span>Our Story</span></div>
-        <!-- CHANGE_TEXT: BLOCK_7_TITLE -->
-        <h2>Это только начало</h2>
-        <div class="content">
-          <img class="photo" src="image/photo_7_2026-02-13_22-12-10.jpg" alt="Фото 7" loading="lazy" decoding="async" />
-          <div class="text-space">
-            <p class="text-title">Записка Любимой</p>
-            <!-- CHANGE_TEXT: BLOCK_7_TEXT -->
-            <div class="text-line w1"></div>С тобой обычный день становится особенным<div class="text-line w2"></div><div class="text-line w3"></div><div class="text-line w4"></div>
+    <!-- 7. Валентинка-открытка -->
+    <section class="screen" id="screen7">
+      <div class="card">
+        <div class="card-header"><span>💘 7/8</span><span>самая тайная</span></div>
+        <h2>Для тебя одной</h2>
+        <div class="content-grid">
+          <div class="photo-frame">
+            <img src="image/photo_7_2026-02-13_22-12-10.jpg" alt="valentine" loading="lazy">
+          </div>
+          <div class="message">
+            <div class="message-line">Внутри этой открытки — всё моё сердце</div>
+            <div class="message-line">Будь моей валентинкой сегодня и всегда</div>
           </div>
         </div>
-      </article>
+      </div>
     </section>
 
-    <section class="screen" id="s8">
-      <article class="panel">
-        <div class="meta"><span class="tag">08 / 08</span><span>Final Surprise</span></div>
-        <!-- CHANGE_TEXT: BLOCK_8_TITLE -->
-        <h2>Финальный сюрприз</h2>
-        <div class="content">
-          <img class="photo" src="image/photo_8_2026-02-13_22-12-10.jpg" alt="Фото 8" loading="lazy" decoding="async" />
-          <div class="text-space">
-            <div class="touch-zone">
-              <!-- CHANGE_TEXT: HOLD_HINT -->
-              <p class="touch-note">Задержи пальчик на отпечатке 5 секунд</p>
-              <div class="fingerprint" id="fingerprint" role="button" tabindex="0" aria-label="Задержи пальчик">
-                <div class="ring" id="ring"></div>
-                <div class="fp-icon" aria-hidden="true">
-                  <svg viewBox="0 0 120 120">
-                    <path d="M60 16c-19 0-34 15-34 34" />
-                    <path d="M79 28c-5-8-12-12-21-12-18 0-32 14-32 32" />
-                    <path d="M92 44c0-18-15-33-33-33S26 26 26 44" />
-                    <path d="M101 60c0-24-18-42-42-42S17 36 17 60" />
-                    <path d="M33 62c0 14-3 27-10 39" />
-                    <path d="M46 62c0 17-4 33-12 47" />
-                    <path d="M59 62c0 20-4 38-11 54" />
-                    <path d="M72 62c0 20 4 38 11 54" />
-                    <path d="M85 62c0 17 5 33 13 47" />
-                    <path d="M98 62c0 14 5 25 12 36" />
-                  </svg>
-                </div>
+    <!-- 8. Финальный сюрприз (волшебный конверт) -->
+    <section class="screen" id="screen8">
+      <div class="card">
+        <div class="card-header"><span>💌 8/8</span><span>секретик</span></div>
+        <h2>Прикоснись к конверту</h2>
+        <div class="content-grid">
+          <div class="photo-frame" style="background: #ffdde9; display: flex; align-items: center; justify-content: center;">
+            <span style="font-size: 4rem;">🎀</span>
+          </div>
+          <div class="message">
+            <div class="valentine-envelope">
+              <div class="heart-progress" id="heartProgress">
+                <i>❤️</i><i>❤️</i><i>❤️</i><i>❤️</i><i>❤️</i><i>❤️</i><i>❤️</i><i>❤️</i><i>❤️</i><i>❤️</i>
               </div>
-              <div class="status" id="status"></div>
-            </div>
-            <div class="certificate" id="certificate">
-              <!-- CHANGE_TEXT: CERT_TITLE -->
-              <h3 class="cert-title">Сертификат любви</h3>
-              <!-- CHANGE_TEXT: CERT_TEXT -->
-              <p>Этот сюрприз говорит о том, что моё сердце всегда выбирает тебя</p>
-              <p class="cert-meta" id="certMeta"></p>
+              <div class="envelope" id="envelope" tabindex="0" role="button"></div>
+              <div class="status-message" id="envelopeStatus">💗 задержи пальчик на конверте</div>
+              <div class="secret-letter" id="secretLetter">
+                <h3 class="letter-title">💖 моя sweet Valentine</h3>
+                <p>Ты — самое лучшее, что случилось 14 февраля. Этот сертификат дарит тебе бесконечные обнимашки и чашку какао с маршмеллоу. Люблю!</p>
+                <p style="margin-top: 12px;">✨ твой тайный поклонник навсегда</p>
+              </div>
             </div>
           </div>
         </div>
-      </article>
+      </div>
     </section>
   </main>
 
   <script>
-    (function () {
-      const scroller = document.getElementById("scroller");
-      const screens = Array.from(document.querySelectorAll(".screen"));
-      const dots = Array.from(document.querySelectorAll(".dot"));
-      const fingerprint = document.getElementById("fingerprint");
-      const ring = document.getElementById("ring");
-      const statusEl = document.getElementById("status");
-      const certEl = document.getElementById("certificate");
-      const certMeta = document.getElementById("certMeta");
-      const photoEls = Array.from(document.querySelectorAll(".photo"));
+    (function() {
+      // floating candies & hearts
+      const floatContainer = document.getElementById('floaties');
+      const symbols = ['🍬', '🍭', '❤️', '💌', '🧁', '🎈', '🐻', '🌸'];
+      for (let i=0; i<22; i++) {
+        let el = document.createElement('div');
+        el.className = 'floaty-item';
+        el.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+        el.style.left = Math.random() * 100 + '%';
+        el.style.top = Math.random() * 100 + '%';
+        el.style.animationDuration = (12 + Math.random() * 20) + 's';
+        el.style.animationDelay = (Math.random() * 10) + 's';
+        el.style.fontSize = (1 + Math.random() * 3) + 'rem';
+        floatContainer.appendChild(el);
+      }
 
-      const HOLD_MS = 5000;
-      let holdStarted = 0;
+      const scroller = document.getElementById('scroller');
+      const screens = Array.from(document.querySelectorAll('.screen'));
+      const dots = Array.from(document.querySelectorAll('.dot'));
+      const envelope = document.getElementById('envelope');
+      const progressContainer = document.getElementById('heartProgress');
+      const statusMsg = document.getElementById('envelopeStatus');
+      const secretLetter = document.getElementById('secretLetter');
+
+      // наблюдатель за экранами
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const index = screens.indexOf(entry.target);
+            entry.target.classList.add('in-view');
+            dots.forEach((d, i) => d.classList.toggle('active', i === index));
+          }
+        });
+      }, { root: scroller, threshold: 0.3 });
+
+      screens.forEach(s => observer.observe(s));
+      screens[0].classList.add('in-view'); // стартовый
+
+      // ======== интерактив с конвертом (милое удержание) ========
+      const hearts = Array.from(progressContainer.children); // 10 сердечек
       let holdActive = false;
+      let holdStartTime = 0;
       let holdDone = false;
-      let raf = null;
-      let heartMarks = [];
-      const LOCAL_KEY = "love_surprise_local";
+      let animFrame = null;
+      const HOLD_MS = 4000; // 4 секунды для нежности
 
-      function setStatus(text, ok) {
-        statusEl.textContent = text;
-        statusEl.classList.toggle("ok", Boolean(ok));
+      function updateHearts(ratio) {
+        const litCount = Math.round(ratio * hearts.length);
+        hearts.forEach((h, idx) => h.classList.toggle('lit', idx < litCount));
       }
 
-      function initHeartProgress() {
-        const heartsCount = 30;
-        const frag = document.createDocumentFragment();
-        for (let i = 0; i < heartsCount; i += 1) {
-          const h = document.createElement("i");
-          h.textContent = "❤";
-          frag.appendChild(h);
-        }
-        ring.appendChild(frag);
-        heartMarks = Array.from(ring.querySelectorAll("i"));
+      function setMessage(text, isSuccess = false) {
+        statusMsg.textContent = text;
+        statusMsg.style.background = isSuccess ? '#ffe2f0' : '#ffffffba';
       }
 
-      function updateRing(ratio) {
-        const clamped = Math.max(0, Math.min(1, ratio));
-        const active = Math.round(clamped * heartMarks.length);
-        heartMarks.forEach((h, idx) => h.classList.toggle("on", idx < active));
-      }
-
-      function showCertificate(doc) {
-        const id = doc.id || "N/A";
-        const signed = doc.signed_at || new Date().toISOString().slice(0, 19).replace("T", " ");
-        certMeta.textContent = "Сюрприз #" + id + " | Дата (UTC): " + signed;
-        certEl.classList.add("show");
-      }
-
-      function saveLocalDocument(seconds) {
-        const doc = {
-          id: "LOCAL",
-          signed_at: new Date().toISOString().slice(0, 19).replace("T", " "),
-          hold_seconds: Number(seconds || 5),
-          note: "local-fallback"
-        };
-        localStorage.setItem(LOCAL_KEY, JSON.stringify(doc));
-        return doc;
-      }
-
-      function readLocalDocument() {
-        try {
-          const raw = localStorage.getItem(LOCAL_KEY);
-          return raw ? JSON.parse(raw) : null;
-        } catch (_) {
-          return null;
-        }
-      }
-
-      async function finishHold(seconds) {
+      function finishHold() {
+        if (holdDone) return;
         holdDone = true;
         holdActive = false;
-        cancelAnimationFrame(raf);
-        updateRing(1);
-        setStatus("Открываю сюрприз...", false);
-        try {
-          const response = await fetch("./api/sign", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ holdSeconds: seconds, note: "fingerprint-surprise" })
-          });
-          const data = await response.json();
-          if (!response.ok || !data.ok) throw new Error(data.error || "Ошибка");
-          showCertificate(data.document || {});
-          setStatus("Готово. Сюрприз сохранен.", true);
-        } catch (err) {
-          const localDoc = saveLocalDocument(seconds);
-          showCertificate(localDoc);
-          setStatus("Готово. Сюрприз сохранен локально в браузере.", true);
-        }
+        cancelAnimationFrame(animFrame);
+        updateHearts(1);
+        envelope.classList.add('tapped');
+        setMessage('🎉 конвертик открылся!', true);
+        secretLetter.classList.add('show');
+        // сохраняем в localStorage, как память
+        localStorage.setItem('valentine_opened', new Date().toLocaleString());
       }
 
-      function tickHold() {
-        if (!holdActive) return;
-        const elapsed = Date.now() - holdStarted;
-        const ratio = Math.min(elapsed / HOLD_MS, 1);
-        updateRing(ratio);
-        setStatus("Держи... " + Math.max(0, Math.ceil(5 - elapsed / 1000)) + "с", false);
-        if (ratio >= 1) {
-          finishHold(elapsed / 1000);
-          return;
-        }
-        raf = requestAnimationFrame(tickHold);
+      function tick() {
+        if (!holdActive || holdDone) return;
+        const elapsed = Date.now() - holdStartTime;
+        const prog = Math.min(elapsed / HOLD_MS, 1);
+        updateHearts(prog);
+        setMessage(`💕 держи ещё ${Math.ceil((HOLD_MS - elapsed)/1000)} сек...`);
+        if (prog >= 1) finishHold();
+        else animFrame = requestAnimationFrame(tick);
       }
 
-      function startHold() {
-        if (holdDone) return;
+      function startHold(e) {
+        if (holdDone) { setMessage('✨ уже открыто', true); return; }
+        if (e) e.preventDefault();
         holdActive = true;
-        holdStarted = Date.now();
-        tickHold();
+        holdStartTime = Date.now();
+        tick();
       }
 
-      function stopHold() {
+      function stopHold(e) {
         if (!holdActive || holdDone) return;
         holdActive = false;
-        cancelAnimationFrame(raf);
-        updateRing(0);
-        setStatus("Немного дольше, держи 5 секунд.", false);
+        cancelAnimationFrame(animFrame);
+        updateHearts(0);
+        setMessage('💔 ещё чуть-чуть — и откроется');
+        envelope.classList.remove('tapped');
       }
 
-      function setupObserver() {
-        const io = new IntersectionObserver((entries) => {
-          entries.forEach((entry) => {
-            if (!entry.isIntersecting) return;
-            const i = screens.indexOf(entry.target);
-            entry.target.classList.add("in-view");
-            dots.forEach((dot, idx) => dot.classList.toggle("active", idx === i));
-          });
-        }, { root: scroller, threshold: 0.25 });
-        screens.forEach((s) => io.observe(s));
-        screens[0].classList.add("in-view");
+      envelope.addEventListener('pointerdown', startHold);
+      ['pointerup', 'pointerleave', 'pointercancel'].forEach(ev => envelope.addEventListener(ev, stopHold));
+      envelope.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); startHold(e); } });
+      envelope.addEventListener('keyup', (e) => { if (e.key === 'Enter' || e.key === ' ') stopHold(e); });
+
+      // проверка, открывался ли уже конверт
+      if (localStorage.getItem('valentine_opened')) {
+        holdDone = true;
+        updateHearts(1);
+        envelope.classList.add('tapped');
+        setMessage('💞 уже открыто', true);
+        secretLetter.classList.add('show');
       }
 
-      function setupImageFallbacks() {
-        const repoName = "I_LOVE_YOU_PUPSIK";
-        const pathParts = window.location.pathname.split("/").filter(Boolean);
-        const firstSegment = pathParts.length > 0 ? pathParts[0] : "";
-
-        photoEls.forEach((img) => {
-          const fileName = img.getAttribute("src").split("/").pop();
-          const candidates = [
-            "image/" + fileName,
-            "./image/" + fileName,
-            "/" + repoName + "/image/" + fileName,
-          ];
-          if (firstSegment) {
-            candidates.push("/" + firstSegment + "/image/" + fileName);
-          }
-
-          let idx = 0;
-          img.addEventListener("error", () => {
-            idx += 1;
-            if (idx < candidates.length) {
-              img.src = candidates[idx];
-              return;
-            }
-            img.alt = "Фото не найдено: " + fileName;
-          });
+      // имитация загрузки фото (заглушки)
+      document.querySelectorAll('img').forEach(img => {
+        img.addEventListener('error', () => {
+          img.src = 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'300\' height=\'200\' viewBox=\'0 0 300 200\'%3E%3Crect width=\'300\' height=\'200\' fill=\'%23ffe2ec\'/%3E%3Ctext x=\'50\' y=\'120\' fill=\'%23b3848c\' font-size=\'28\'%3E🍬%3C/text%3E%3C/svg%3E';
         });
-      }
-
-      async function loadLast() {
-        try {
-          const response = await fetch("./api/last");
-          const data = await response.json();
-          if (data && data.ok && data.last) {
-            holdDone = true;
-            updateRing(1);
-            showCertificate(data.last);
-            setStatus("Сюрприз уже открыт раньше.", true);
-            return;
-          }
-        } catch (_) {
-          // no backend in static hosting mode
-        }
-        const localDoc = readLocalDocument();
-        if (localDoc) {
-          holdDone = true;
-          updateRing(1);
-          showCertificate(localDoc);
-          setStatus("Сюрприз уже открыт раньше.", true);
-        }
-      }
-
-      fingerprint.addEventListener("pointerdown", startHold);
-      ["pointerup", "pointerleave", "pointercancel"].forEach((evt) => {
-        fingerprint.addEventListener(evt, stopHold);
       });
 
-      fingerprint.addEventListener("keydown", (e) => {
-        if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault();
-          startHold();
-        }
+      // dots кликабельны
+      dots.forEach((dot, idx) => {
+        dot.addEventListener('click', () => {
+          screens[idx].scrollIntoView({ behavior: 'smooth' });
+        });
       });
-      fingerprint.addEventListener("keyup", (e) => {
-        if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault();
-          stopHold();
-        }
-      });
-
-      setupObserver();
-      setupImageFallbacks();
-      initHeartProgress();
-      loadLast();
     })();
   </script>
 </body>
