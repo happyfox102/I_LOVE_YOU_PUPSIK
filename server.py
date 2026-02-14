@@ -4,7 +4,12 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import urlparse
 
-from database import get_last_signature, init_db, save_signature
+from database import (
+    get_last_signature,
+    init_db,
+    save_button_click,
+    save_signature,
+)
 
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -73,7 +78,7 @@ class ValentineHandler(BaseHTTPRequestHandler):
 
     def do_POST(self) -> None:
         parsed = urlparse(self.path)
-        if parsed.path != "/api/sign":
+        if parsed.path not in ("/api/sign", "/api/click"):
             self.send_error(404, "Not found")
             return
 
@@ -91,18 +96,33 @@ class ValentineHandler(BaseHTTPRequestHandler):
             self._send_json({"ok": False, "error": "Invalid JSON"}, 400)
             return
 
-        hold_seconds = float(payload.get("holdSeconds", 0))
-        note = payload.get("note")
-        if hold_seconds < 5:
-            self._send_json(
-                {"ok": False, "error": "Hold duration must be at least 5 seconds"},
-                400,
-            )
+        if parsed.path == "/api/sign":
+            hold_seconds = float(payload.get("holdSeconds", 0))
+            note = payload.get("note")
+            if hold_seconds < 5:
+                self._send_json(
+                    {"ok": False, "error": "Hold duration must be at least 5 seconds"},
+                    400,
+                )
+                return
+
+            doc_id = save_signature(hold_seconds=hold_seconds, note=note)
+            last = get_last_signature()
+            self._send_json({"ok": True, "documentId": doc_id, "document": last})
             return
 
-        doc_id = save_signature(hold_seconds=hold_seconds, note=note)
-        last = get_last_signature()
-        self._send_json({"ok": True, "documentId": doc_id, "document": last})
+        action_label = str(payload.get("actionLabel", "")).strip()
+        sticker = payload.get("sticker")
+        photo_src = payload.get("photoSrc")
+        if not action_label:
+            self._send_json({"ok": False, "error": "actionLabel is required"}, 400)
+            return
+        click_id = save_button_click(
+            action_label=action_label,
+            sticker=str(sticker) if sticker is not None else None,
+            photo_src=str(photo_src) if photo_src is not None else None,
+        )
+        self._send_json({"ok": True, "clickId": click_id})
 
     def log_message(self, fmt: str, *args) -> None:
         return

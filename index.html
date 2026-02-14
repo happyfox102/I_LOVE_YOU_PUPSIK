@@ -372,7 +372,7 @@
       }
     }
 
-    @media (max-width: 760px) {
+    @media (max-width: 900px), (pointer: coarse) {
       .dots { display: none; }
       .screen { padding: 10px; }
       .panel { min-height: 92svh; padding: 10px; border-radius: 20px; }
@@ -392,7 +392,7 @@
       .photo {
         height: auto;
         min-height: 0;
-        max-height: 56svh;
+        max-height: none;
         object-fit: contain;
         object-position: center;
       }
@@ -651,6 +651,18 @@
         }
       }
 
+      async function trackButtonClick(actionLabel, sticker, photoSrc) {
+        try {
+          await fetch("./api/click", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ actionLabel, sticker, photoSrc }),
+          });
+        } catch (_) {
+          // keep UI silent if backend is unavailable
+        }
+      }
+
       async function finishHold(seconds) {
         holdDone = true;
         holdActive = false;
@@ -802,7 +814,10 @@
           controls.addEventListener("click", (event) => {
             const btn = event.target.closest(".love-btn");
             if (!btn) return;
-            burst(layer, btn.dataset.sticker || "💖");
+            const sticker = btn.dataset.sticker || "💖";
+            const actionLabel = btn.textContent.trim();
+            burst(layer, sticker);
+            trackButtonClick(actionLabel, sticker, img.getAttribute("src"));
           });
         });
       }

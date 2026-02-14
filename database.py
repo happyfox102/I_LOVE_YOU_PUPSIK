@@ -24,6 +24,17 @@ def init_db() -> None:
             )
             """
         )
+        conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS button_clicks (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                clicked_at TEXT NOT NULL,
+                action_label TEXT NOT NULL,
+                sticker TEXT,
+                photo_src TEXT
+            )
+            """
+        )
         conn.commit()
 
 
@@ -58,3 +69,18 @@ def get_last_signature() -> Optional[dict]:
         "hold_seconds": row["hold_seconds"],
         "note": row["note"],
     }
+
+
+def save_button_click(
+    action_label: str, sticker: Optional[str] = None, photo_src: Optional[str] = None
+) -> int:
+    with get_connection() as conn:
+        cursor = conn.execute(
+            """
+            INSERT INTO button_clicks (clicked_at, action_label, sticker, photo_src)
+            VALUES (datetime('now'), ?, ?, ?)
+            """,
+            (action_label, sticker, photo_src),
+        )
+        conn.commit()
+        return int(cursor.lastrowid)
